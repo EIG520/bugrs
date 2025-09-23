@@ -157,7 +157,7 @@ impl<const WIDTH: usize, const SIZE: usize> ToString for TileGrid<WIDTH, SIZE> {
             for x in 0..(WIDTH) {
                 s = format!("{s}{}", match self.get(x,y) {
                     x if x > std::u32::MAX - 3 => {"#"}
-                    x => {" "}
+                    _ => {" "}
                 })
             }
         }
