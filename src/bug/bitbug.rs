@@ -114,17 +114,15 @@ impl<const WIDTH: usize, const SIZE: usize> TileGrid<WIDTH, SIZE> {
         let mut type_twos = 0;
         let mut type_threes = vec![];
 
-        for dy in 0..=2 {
-            for dx in 0..=2 {
-                let pos = (x + dx - 1, y + dy - 1);
-                let val = self.get(x + dx - 1, y + dy - 1);
+        for (dy, dx) in [(0,0),(1,0),(2,0),(0,1),(2,1),(0,2),(1,2),(2,2)] {
+            let pos = (x + dx - 1, y + dy - 1);
+            let val = self.get(x + dx - 1, y + dy - 1);
 
-                match TILE_MAX - val {
-                    0 => {type_ones += 1},
-                    1 => {type_twos += 1},
-                    2 => {type_threes.push(pos)},
-                    _ => {}
-                }
+            match TILE_MAX - val {
+                0 => {type_ones += 1},
+                1 => {type_twos += 1},
+                2 => {type_threes.push(pos)},
+                _ => {}
             }
         }
 
