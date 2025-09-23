@@ -85,6 +85,12 @@ impl<const WIDTH: usize, const SIZE: usize> BitBug<WIDTH, SIZE> {
 }
 
 
+// pub struct MicroGrid<const WIDTH: usize, const SIZE: usize> {
+//     type1_board: u128,
+//     type2_board: u128,
+//     type3_board: u128,
+// }
+
 #[derive(Clone, Copy)]
 pub struct TileGrid<const WIDTH: usize, const SIZE: usize> {
     tiles: [u32; SIZE],
@@ -101,8 +107,8 @@ impl<const WIDTH: usize, const SIZE: usize> TileGrid<WIDTH, SIZE> {
 
     // umm hello??? based department???
     pub fn set_wall(&mut self, x: usize, y: usize) -> bool {
-        let mut type_ones = vec![];
-        let mut type_twos = vec![];
+        let mut type_ones = 0;
+        let mut type_twos = 0;
         let mut type_threes = vec![];
 
         for dy in 0..=2 {
@@ -111,16 +117,16 @@ impl<const WIDTH: usize, const SIZE: usize> TileGrid<WIDTH, SIZE> {
                 let val = self.get(x + dx - 1, y + dy - 1);
 
                 match std::u32::MAX - val {
-                    0 => {type_ones.push(pos)},
-                    1 => {type_twos.push(pos)},
+                    0 => {type_ones += 1},
+                    1 => {type_twos += 1},
                     2 => {type_threes.push(pos)},
                     _ => {}
                 }
             }
         }
 
-        if type_ones.len() > 0 && type_twos.len() > 0 { return false; }
-        if type_ones.len() > 0 {
+        if type_ones > 0 && type_twos > 0 { return false; }
+        if type_ones > 0 {
             self.set(x, y, std::u32::MAX);
             
             for &(x2, y2) in &type_threes {
@@ -128,7 +134,7 @@ impl<const WIDTH: usize, const SIZE: usize> TileGrid<WIDTH, SIZE> {
             }
             return true;
         }
-        if type_twos.len() > 0 {
+        if type_twos > 0 {
             self.set(x, y, std::u32::MAX - 1);
             
             for &(x2, y2) in &type_threes {

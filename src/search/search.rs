@@ -32,6 +32,10 @@ impl<const WIDTH: usize, const SIZE: usize> Searcher<WIDTH, SIZE> {
         Some(())
     }
 
+    pub fn reserve(&mut self, elems: usize) {
+        self.to_search.reserve(elems);
+    }
+
     pub fn new(position: BitBug<WIDTH, SIZE>) -> Self {
         Self {
             to_search: vec![position.clone()],
