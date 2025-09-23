@@ -2,7 +2,7 @@ use std::time::Instant;
 
 use bugrs::{bug::bitbug::BitBug, search::search::Searcher};
 
-const WIDTH: usize = 9;
+const WIDTH: usize = 8;
 const SIZE: usize = WIDTH * WIDTH;
 
 fn main() {

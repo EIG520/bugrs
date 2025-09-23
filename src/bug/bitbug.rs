@@ -46,10 +46,18 @@ impl<const WIDTH: usize, const SIZE: usize> BitBug<WIDTH, SIZE> {
     pub fn take_step(&mut self) {
         self.steps += 1;
         self.tiles.set(self.pos.0, self.pos.1, self.tiles.get(self.pos.0, self.pos.1) + 1);
-        let mut move_dir = vec![self.dir, Direction::Down, Direction::Right, Direction::Up, Direction::Left];
-        move_dir.sort_by(|d, d2| self.tile_at_dir(d).cmp(&self.tile_at_dir(d2)));
 
-        let mv = move_dir[0];
+        let mut mv = self.dir;
+        let mut score = self.tile_at_dir(&self.dir);
+
+        for d in [Direction::Down, Direction::Right, Direction::Up, Direction::Left] {
+            if self.tile_at_dir(&d) < score {
+                score = self.tile_at_dir(&d);
+                mv = d;
+            }
+        }
+
+
         self.pos = mv.move_coordinates(self.pos);
         self.dir = mv;
     }
