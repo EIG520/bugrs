@@ -62,7 +62,7 @@ impl<const WIDTH: usize, const SIZE: usize> BitBug<WIDTH, SIZE> {
         self.dir = mv;
     }
 
-    pub fn tile_at_dir(&self, dir: &Direction) -> u32 {
+    pub fn tile_at_dir(&self, dir: &Direction) -> Tile {
         let oset = dir.move_coordinates(self.pos);
         self.tiles.get(oset.0, oset.1)
     }
@@ -91,17 +91,20 @@ impl<const WIDTH: usize, const SIZE: usize> BitBug<WIDTH, SIZE> {
 //     type3_board: u128,
 // }
 
+type Tile = u8;
+const TILE_MAX: Tile = std::u8::MAX;
+
 #[derive(Clone, Copy)]
 pub struct TileGrid<const WIDTH: usize, const SIZE: usize> {
-    tiles: [u32; SIZE],
+    tiles: [Tile; SIZE],
 }
 
 impl<const WIDTH: usize, const SIZE: usize> TileGrid<WIDTH, SIZE> {
-    pub fn set(&mut self, x: usize, y: usize, value: u32) {
+    pub fn set(&mut self, x: usize, y: usize, value: Tile) {
         self.tiles[x + y * WIDTH] = value;
     }
 
-    pub fn get(&self, x: usize, y: usize) -> u32 {
+    pub fn get(&self, x: usize, y: usize) -> Tile {
         self.tiles[x + y * WIDTH]
     }
 
@@ -116,7 +119,7 @@ impl<const WIDTH: usize, const SIZE: usize> TileGrid<WIDTH, SIZE> {
                 let pos = (x + dx - 1, y + dy - 1);
                 let val = self.get(x + dx - 1, y + dy - 1);
 
-                match std::u32::MAX - val {
+                match TILE_MAX - val {
                     0 => {type_ones += 1},
                     1 => {type_twos += 1},
                     2 => {type_threes.push(pos)},
@@ -127,7 +130,7 @@ impl<const WIDTH: usize, const SIZE: usize> TileGrid<WIDTH, SIZE> {
 
         if type_ones > 0 && type_twos > 0 { return false; }
         if type_ones > 0 {
-            self.set(x, y, std::u32::MAX);
+            self.set(x, y, TILE_MAX);
             
             for &(x2, y2) in &type_threes {
                 self.set_wall(x2, y2);
@@ -135,7 +138,7 @@ impl<const WIDTH: usize, const SIZE: usize> TileGrid<WIDTH, SIZE> {
             return true;
         }
         if type_twos > 0 {
-            self.set(x, y, std::u32::MAX - 1);
+            self.set(x, y, TILE_MAX - 1);
             
             for &(x2, y2) in &type_threes {
                 self.set_wall(x2, y2);
@@ -143,7 +146,7 @@ impl<const WIDTH: usize, const SIZE: usize> TileGrid<WIDTH, SIZE> {
             return true;
         }
 
-        self.set(x,y, std::u32::MAX -2);
+        self.set(x,y, TILE_MAX -2);
         true
     }
 }
@@ -156,7 +159,7 @@ impl<const WIDTH: usize, const SIZE: usize> ToString for TileGrid<WIDTH, SIZE> {
             s = format!("{s}\n");
             for x in 0..(WIDTH) {
                 s = format!("{s}{}", match self.get(x,y) {
-                    x if x > std::u32::MAX - 3 => {"#"}
+                    x if x > TILE_MAX - 3 => {"#"}
                     _ => {" "}
                 })
             }
@@ -171,13 +174,13 @@ impl<const WIDTH: usize, const SIZE: usize> Default for TileGrid<WIDTH, SIZE> {
         let mut grid = TileGrid { tiles: [0; SIZE] };
 
         for x in 0..(WIDTH) {
-            grid.set(x, 0, std::u32::MAX - 1);
-            grid.set(x, SIZE / WIDTH - 1, std::u32::MAX);
+            grid.set(x, 0, TILE_MAX - 1);
+            grid.set(x, SIZE / WIDTH - 1, TILE_MAX);
         }
 
         for y in 0..(SIZE / WIDTH) {
-            grid.set(0, y, std::u32::MAX);
-            grid.set(WIDTH - 1, y, std::u32::MAX - 1);
+            grid.set(0, y, TILE_MAX);
+            grid.set(WIDTH - 1, y, TILE_MAX - 1);
         }
 
         grid
