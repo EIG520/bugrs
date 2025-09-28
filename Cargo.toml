@@ -3,4 +3,8 @@ name = "bugrs"
 version = "0.1.0"
 edition = "2024"
 
+[profile.release]
+strip = false
+debug = true
+
 [dependencies]

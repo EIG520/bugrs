@@ -2,13 +2,18 @@ use crate::bug::bitbug::BitBug;
 
 pub struct Searcher<const WIDTH: usize, const SIZE: usize> {
     pub to_search: Vec<BitBug<WIDTH, SIZE>>,
-    current_best: BitBug<WIDTH, SIZE>,
-    best_score: u64
+    pub current_best: BitBug<WIDTH, SIZE>,
+    pub best_score: u64
 }
 
 impl<const WIDTH: usize, const SIZE: usize> Searcher<WIDTH, SIZE> {
     pub fn search_last(&mut self) -> Option<()>{
-        let mut game = self.to_search.pop()?;
+        let game = self.to_search.pop()?;
+
+        self.search_game(game)
+    }
+
+    pub fn search_game(&mut self, mut game: BitBug<WIDTH, SIZE>) -> Option<()> {
 
         while !game.is_done() {
             let mut game_cpy = game.clone();
@@ -22,8 +27,8 @@ impl<const WIDTH: usize, const SIZE: usize> Searcher<WIDTH, SIZE> {
         }
 
         if game.steps >= self.best_score {
-            println!("{}", game.clone().to_string());
-            println!("{}", game.steps);
+            // println!("{}", game.clone().to_string());
+            // println!("{}", game.steps);
 
             self.best_score = game.steps;
             self.current_best = game;

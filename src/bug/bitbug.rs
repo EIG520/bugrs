@@ -91,8 +91,8 @@ impl<const WIDTH: usize, const SIZE: usize> BitBug<WIDTH, SIZE> {
 //     type3_board: u128,
 // }
 
-type Tile = u8;
-const TILE_MAX: Tile = std::u8::MAX;
+type Tile = u16;
+const TILE_MAX: Tile = std::u16::MAX;
 
 #[derive(Clone, Copy)]
 pub struct TileGrid<const WIDTH: usize, const SIZE: usize> {
