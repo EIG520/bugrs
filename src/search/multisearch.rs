@@ -19,7 +19,7 @@ impl<const WIDTH: usize, const SIZE: usize> MSearcher<WIDTH, SIZE> {
 
             if game.unseen() {
                 if game_cpy.set_wall(game.pos().0, game.pos().1) {
-                    if game_cpy.steps <= 10 {
+                    if game_cpy.tiles.walls <= 5 {
                         self.to_search.lock().ok()?.push(game_cpy);
                     } else {
                         let mut searcher = Searcher::new(game_cpy);

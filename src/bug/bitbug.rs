@@ -1,6 +1,6 @@
 #[derive(Clone)]
 pub struct BitBug<const WIDTH: usize, const SIZE: usize> {
-    tiles: TileGrid<WIDTH, SIZE>,
+    pub tiles: TileGrid<WIDTH, SIZE>,
     pos: (usize, usize),
     dir: Direction,
     pub steps: u64
@@ -10,6 +10,17 @@ impl<const WIDTH: usize, const SIZE: usize> Default for BitBug<WIDTH, SIZE> {
     fn default() -> Self {
         Self {
             tiles: TileGrid::<WIDTH, SIZE>::default(),
+            pos: (1,1),
+            dir: Direction::Up,
+            steps: 0
+        }
+    }
+}
+
+impl<const WIDTH: usize, const SIZE: usize> From<String> for BitBug<WIDTH, SIZE> {
+    fn from(value: String) -> Self {
+        Self {
+            tiles: TileGrid::<WIDTH, SIZE>::from(value),
             pos: (1,1),
             dir: Direction::Up,
             steps: 0
@@ -97,6 +108,7 @@ const TILE_MAX: Tile = std::u16::MAX;
 #[derive(Clone, Copy)]
 pub struct TileGrid<const WIDTH: usize, const SIZE: usize> {
     tiles: [Tile; SIZE],
+    pub walls: u16,
 }
 
 impl<const WIDTH: usize, const SIZE: usize> TileGrid<WIDTH, SIZE> {
@@ -110,6 +122,8 @@ impl<const WIDTH: usize, const SIZE: usize> TileGrid<WIDTH, SIZE> {
 
     // umm hello??? based department???
     pub fn set_wall(&mut self, x: usize, y: usize) -> bool {
+        if self.get(x,y) < TILE_MAX - 2 { self.walls += 1; }
+
         let mut type_ones = 0;
         let mut type_twos = 0;
         let mut type_threes = vec![];
@@ -163,13 +177,31 @@ impl<const WIDTH: usize, const SIZE: usize> ToString for TileGrid<WIDTH, SIZE> {
             }
         }
 
+        s = format!("{s}\n{}", self.walls);
+
         s
     }
 }
 
+impl<const WIDTH: usize, const SIZE: usize> From<String> for TileGrid<WIDTH, SIZE> {
+    fn from(disp: String) -> Self {
+        let mut slf = TileGrid::default();
+        let srows = disp.split("\n");
+
+        for (y,row) in srows.enumerate().skip(1).take(SIZE / WIDTH - 2) {
+            for (x, c) in row.chars().enumerate().skip(1).take(WIDTH - 2) {
+                if c == '#' {
+                    slf.set_wall(x, y);
+                }
+            }
+        }
+
+        slf
+    }
+}
 impl<const WIDTH: usize, const SIZE: usize> Default for TileGrid<WIDTH, SIZE> {
     fn default() -> Self {
-        let mut grid = TileGrid { tiles: [0; SIZE] };
+        let mut grid = TileGrid { tiles: [0; SIZE], walls: 0 };
 
         for x in 0..(WIDTH) {
             grid.set(x, 0, TILE_MAX - 1);
