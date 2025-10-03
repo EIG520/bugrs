@@ -93,6 +93,14 @@ impl<const WIDTH: usize, const SIZE: usize> BitBug<WIDTH, SIZE> {
     pub fn set_wall(&mut self, x: usize, y: usize) -> bool {
         self.tiles.set_wall(x, y)
     }
+
+    pub fn simulate(&mut self) -> u64 {
+        while !self.is_done() {
+            self.take_step();
+        }
+
+        self.steps
+    }
 }
 
 
@@ -102,8 +110,8 @@ impl<const WIDTH: usize, const SIZE: usize> BitBug<WIDTH, SIZE> {
 //     type3_board: u128,
 // }
 
-type Tile = u16;
-const TILE_MAX: Tile = std::u16::MAX;
+pub type Tile = u16;
+pub const TILE_MAX: Tile = std::u16::MAX;
 
 #[derive(Clone, Copy)]
 pub struct TileGrid<const WIDTH: usize, const SIZE: usize> {
@@ -161,6 +169,7 @@ impl<const WIDTH: usize, const SIZE: usize> TileGrid<WIDTH, SIZE> {
         self.set(x,y, TILE_MAX -2);
         true
     }
+
 }
 
 impl<const WIDTH: usize, const SIZE: usize> ToString for TileGrid<WIDTH, SIZE> {
@@ -180,6 +189,31 @@ impl<const WIDTH: usize, const SIZE: usize> ToString for TileGrid<WIDTH, SIZE> {
         s = format!("{s}\n{}", self.walls);
 
         s
+    }
+}
+
+impl<const WIDTH: usize, const SIZE: usize> From<Vec<usize>> for BitBug<WIDTH, SIZE> {
+    fn from(value: Vec<usize>) -> Self {
+        let mut bug = BitBug::default();
+
+        for val in value {
+            for _ in 0..val {
+                bug.take_step();
+
+                if bug.is_done() { return bug; }
+            }
+
+            let mut b2 = bug.clone();
+            b2.take_step();
+
+            if b2.unseen() {
+                if !bug.set_wall(b2.pos().0, b2.pos().1) {
+                    bug = b2;
+                }
+            }
+        }
+
+        bug
     }
 }
 
