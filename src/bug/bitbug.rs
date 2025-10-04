@@ -101,6 +101,15 @@ impl<const WIDTH: usize, const SIZE: usize> BitBug<WIDTH, SIZE> {
 
         self.steps
     }
+
+    pub fn can_wall_next(&mut self) -> bool {
+        let mut b2 = self.clone();
+        b2.take_step();
+
+        let mut b3 = self.clone();
+
+        return b2.unseen() && b3.set_wall(b2.pos().0, b2.pos().1);
+    }
 }
 
 
@@ -197,20 +206,25 @@ impl<const WIDTH: usize, const SIZE: usize> From<Vec<usize>> for BitBug<WIDTH, S
         let mut bug = BitBug::default();
 
         for val in value {
-            for _ in 0..val {
+            let mut i = 0;
+            while i < val {
+                if bug.can_wall_next() { i += 1; }
                 bug.take_step();
 
+                if bug.is_done() { return bug; }
+            }
+
+            while !bug.can_wall_next() {
+                bug.take_step();
                 if bug.is_done() { return bug; }
             }
 
             let mut b2 = bug.clone();
             b2.take_step();
 
-            if b2.unseen() {
-                if !bug.set_wall(b2.pos().0, b2.pos().1) {
-                    bug = b2;
-                }
-            }
+            if bug.is_done() {return bug; }
+
+            bug.set_wall(b2.pos().0, b2.pos().1);
         }
 
         bug

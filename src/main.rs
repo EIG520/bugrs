@@ -2,6 +2,7 @@ use std::env;
 use std::time::Duration;
 
 use bugrs::generators::anneal::*;
+use bugrs::generators::mcts::TreeSearcher;
 use bugrs::search::multisearch::{FullSearcher, Search};
 use bugrs::util::parse_usize_const;
 use bugrs::{bug::bitbug::BitBug};
@@ -14,11 +15,36 @@ const SIZE: usize = WIDTH * HEIGHT;
 fn main() {
     let args = std::env::args();
     let mut anneal = false;
+    let mut testc = false;
+    let mut mcts = false;
 
     for arg in args {
+        match arg.as_str() {
+            "anneal" => {anneal = true;}
+            "mcts" => {mcts = true;}
+            "test" => {testc = true;}
+            _ => {}
+        }
         if arg == "anneal" {
             anneal = true;
         }
+    }
+
+    if mcts {
+        let mut trs = TreeSearcher::<WIDTH, SIZE>::default();
+
+        loop {
+            trs.playout();
+        }
+
+        return;
+    }
+
+    if testc {
+        let bug: BitBug<WIDTH, SIZE> = BitBug::from(vec![1,2,3,4,5]);
+
+        println!("{}", bug.to_string());
+        return;
     }
 
     if anneal {
